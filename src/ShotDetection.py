@@ -33,7 +33,7 @@ def get_shots(frame_type, path, path_mp4, analysis_type = "HSV-Shot-Bhattacharya
 
     filtered_res = Helper.filter_predictions(res, 0.45)
 
-    Helper.write_to_json(res, "{}/{}-stats.json".format(dest_dir, analysis_type))
+    Helper.write_to_json(filtered_res, "{}/{}-stats.json".format(dest_dir, analysis_type))
     # Helper.plot_hist_diff(hist_diff, "{}/{}-hist.png".format(dest_dir, analysis_type), hline=threshold, dot_coords=res["frames"])
     
-    return filtered_res
+    return filtered_res, video.frame_count

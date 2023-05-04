@@ -23,5 +23,5 @@ def get_scenes(frame_type, path_rgb, analysis_type = "HSV_HUE-Scene-ChiSquareAlt
     Helper.write_to_json(res, "{}/{}-stats.json".format(dest_dir, analysis_type))
     # Helper.plot_hist_diff(hist_diff, "{}/{}-hist.png".format(dest_dir, analysis_type), hline=threshold, dot_coords=res["frames"])
 
-    return res
+    return res, video.frame_count
 

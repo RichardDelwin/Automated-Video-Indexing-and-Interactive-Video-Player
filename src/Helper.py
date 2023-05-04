@@ -95,6 +95,18 @@ class Helper:
         df.reset_index(inplace=True)
         return df.to_dict('list')
 
+    @staticmethod
+    def filter_predictions(result,threshold=0.5):
+        # Filter based on threshold of final ensemble
+        df = pd.DataFrame.from_dict(result)
+        df = df[df.weighted_preds >= threshold]
+
+        # Remove redundant timestamps
+        df.drop_duplicates('time_stamps', inplace=True)
+        df.reset_index(inplace=True)
+        return df.to_dict('list')
+
+
     def plot_mfcc_diff_value(values, filename, savefig=True, dot_coords=None):
 
         figsize = (35, 15)
