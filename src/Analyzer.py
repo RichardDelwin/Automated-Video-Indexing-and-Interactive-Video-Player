@@ -48,15 +48,28 @@ class Analyzer:
 
         return self.remove_redundantFrames({"frames": indices, "time_stamps": time_stamps})
 
-    def findKeyFramesAndTimeStampsOfShots(self, threshold, keyFrames):
+    def calc_dist_from_threshold(self, idx, threshold):
+        if self.data[idx] >= threshold:
+            return ((((self.data[idx]-threshold)/(1.0-threshold))*(1-0.5))+0.5)
+        else:
+            return (((self.data[idx])/(threshold))*(0.5))
+            
+    def findKeyFramesAndTimeStamps_shot(self, threshold):
         # adjusting frame number since frame 0 is not computed
-        indices = list(map(lambda x: int(x + 1), np.where(np.array(self.data) >= threshold)[0]))
+        indices = list(range(1,len(self.data)+1))
+        time_stamps = list(map(Helper.calculate_frame_time, indices))
+        dist_from_threshold = [self.calc_dist_from_threshold(idx-1, threshold) for idx in indices]
+        return {"frames": indices, "time_stamps": time_stamps, "dist_from_threshold": dist_from_threshold}
 
-        indices2 = list(map(lambda x : keyFrames[x], indices))
+    # def findKeyFramesAndTimeStampsOfShots(self, threshold, keyFrames):
+    #     # adjusting frame number since frame 0 is not computed
+    #     indices = list(map(lambda x: int(x + 1), np.where(np.array(self.data) >= threshold)[0]))
 
-        time_stamps = list(map(Helper.calculate_frame_time, indices2))
+    #     indices2 = list(map(lambda x : keyFrames[x], indices))
 
-        return self.remove_redundantFrames({"frames": indices, "time_stamps": time_stamps})
+    #     time_stamps = list(map(Helper.calculate_frame_time, indices2))
+
+    #     return self.remove_redundantFrames({"frames": indices, "time_stamps": time_stamps})
 
     def remove_redundantFrames(self, data):
 

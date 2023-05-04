@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 from matplotlib import pyplot as plt
+import pandas as pd
 
 
 class Helper:
@@ -71,6 +72,28 @@ class Helper:
         if savefig:
             plt.savefig(filename)
 
+    @staticmethod
+    def get_weighted_preds(ml_preds, hist_preds):
+        frames = hist_preds["frames"]
+        dist_from_threshold = hist_preds["dist_from_threshold"]
+        weighted_preds = []
+        for idx, frame_no in enumerate(frames):
+            ml_val = ml_preds[frame_no-1]
+            hist_val = dist_from_threshold[idx]
+            wt_val = 0.6*hist_val + 0.4*ml_val
+            weighted_preds.append(wt_val)
+        return weighted_preds
+    
+    @staticmethod
+    def filter_predictions(result,threshold=0.5):
+        # Filter based on threshold of final ensemble
+        df = pd.DataFrame.from_dict(result)
+        df = df[df.weighted_preds >= threshold]
+
+        # Remove redundant timestamps
+        df.drop_duplicates('time_stamps', inplace=True)
+        df.reset_index(inplace=True)
+        return df.to_dict('list')
 
     def plot_mfcc_diff_value(values, filename, savefig=True, dot_coords=None):
 
