@@ -128,51 +128,42 @@ class RGBVideo:
     def convertToInt32(self, frameList):
         return np.array(frameList).astype(np.int32)
 
-    def __calc_hist(self, frame):
+    def __calc_hist(self, frame, hist_bins=256, do_normalize = False):
         # Compute the histogram of the frame
-        hist = cv2.calcHist([frame], [0], None, [256], [0, 256])
+        hist = cv2.calcHist([frame], [0], None, [hist_bins], [0, 256])
         # Normalize the histogram
-        hist = cv2.normalize(hist, None).flatten()
+        if do_normalize:
+            hist = cv2.normalize(hist, None).flatten()
         return hist
 
-    def __calc_hist_wo_norm(self, frame):
-        # Compute the histogram of the frame
-        hist = cv2.calcHist([frame], [0], None, [256], [0, 256])
-        return hist
+    # def __calc_hist_wo_norm(self, frame):
+    #     # Compute the histogram of the frame
+    #     hist = cv2.calcHist([frame], [0], None, [256], [0, 256])
+    #     return hist
 
-    def __compare_hist_kl_div(self, frame1, frame2):
-        # Compute the histograms of the two frames
-        hist1 = self.__calc_hist(frame1)
-        hist2 = self.__calc_hist(frame2)
-        # Calculate the KL divergence between the histograms
-
-        # cv2.HISTCMP_KL_DIV
-        # HISTCMP_CORREL
-        # HISTCMP_CHISQR
-        kl_div = cv2.compareHist(hist1, hist2, cv2.HISTCMP_KL_DIV)
-        return kl_div
+    # def __compare_hist_kl_div(self, frame1, frame2):
+    #     # Compute the histograms of the two frames
+    #     hist1 = self.__calc_hist(frame1)
+    #     hist2 = self.__calc_hist(frame2)
+    #     # Calculate the KL divergence between the histograms
+    #
+    #     # cv2.HISTCMP_KL_DIV
+    #     # HISTCMP_CORREL
+    #     # HISTCMP_CHISQR
+    #     kl_div = cv2.compareHist(hist1, hist2, cv2.HISTCMP_KL_DIV)
+    #     return kl_div
 
     def __compare_hist_bhattacharya(self, frame1, frame2):
         # Compute the histograms of the two frames
         hist1 = self.__calc_hist(frame1)
         hist2 = self.__calc_hist(frame2)
-        # Calculate the KL divergence between the histograms
-
-        # cv2.HISTCMP_KL_DIV
-        # HISTCMP_CORREL
-        # HISTCMP_CHISQR
         bhattacharya = cv2.compareHist(hist1, hist2, cv2.HISTCMP_BHATTACHARYYA)
         return bhattacharya
 
     def __compare_hist_chiSquare(self, frame1, frame2):
         # Compute the histograms of the two frames
-        hist1 = self.__calc_hist(frame1)
-        hist2 = self.__calc_hist(frame2)
-        # Calculate the KL divergence between the histograms
-
-        # cv2.HISTCMP_KL_DIV
-        # HISTCMP_CORREL
-        # HISTCMP_CHISQR
+        hist1 = self.__calc_hist(frame1, do_normalize=True)
+        hist2 = self.__calc_hist(frame2, do_normalize=True)
         d = cv2.compareHist(hist1, hist2, cv2.HISTCMP_CHISQR_ALT)
         return d
 
@@ -198,70 +189,64 @@ class RGBVideo:
         print(f"Frame {frame_num} saved to {os.path.abspath(output_filename)}")
         print("Frame Shape = ", frame.shape)
 
-    def get_hist_diff(self, frameList, frame_type="RGB"):
-        hist_diff = []
-
-        # if len(frameList) == 0:
-        #     frameList = self.__resolveFrame(frame_type)
-
-        for i in range(1, len(frameList)):
-            # Compute the KL divergence between the histograms of the current and previous frames
-            kl_div = self.__compare_hist_kl_div(frameList[i], frameList[i - 1])
-            hist_diff.append(kl_div)
-
-        return hist_diff
+    # def get_hist_diff(self, frameList, frame_type="RGB"):
+    #     hist_diff = []
+    #
+    #     # if len(frameList) == 0:
+    #     #     frameList = self.__resolveFrame(frame_type)
+    #
+    #     for i in range(1, len(frameList)):
+    #         # Compute the KL divergence between the histograms of the current and previous frames
+    #         kl_div = self.__compare_hist_kl_div(frameList[i], frameList[i - 1])
+    #         hist_diff.append(kl_div)
+    #
+    #     return hist_diff
 
     def get_hist_diff_bhattacharya(self, frameList):
 
         hist_diff = []
-        hist_values = [self.__calc_hist_wo_norm(frameList[0])]
 
         for i in range(1, len(frameList)):
 
-            hist_values.append(self.__calc_hist_wo_norm(frameList[i]))
             # Compute the KL divergence between the histograms of the current and previous frames
             b = self.__compare_hist_bhattacharya(frameList[i], frameList[i - 1])
             hist_diff.append(b)
 
-        return hist_diff, hist_values
+        return hist_diff
 
     def get_hist_diff_chiSquare(self, frameList):
 
         hist_diff = []
-        hist_values = [self.__calc_hist_wo_norm(frameList[0])]
 
         for i in range(1, len(frameList)):
 
-            hist_values.append(self.__calc_hist_wo_norm(frameList[i]))
             # Compute the KL divergence between the histograms of the current and previous frames
             b = self.__compare_hist_chiSquare(frameList[i], frameList[i - 1])
             hist_diff.append(b)
 
-        return hist_diff, hist_values
+        return hist_diff
 
-    def get_hist_abs_diff(self, frameList):
-
-        frameList = np.array(frameList).astype(np.int32)
-        hist_diff = []
-        hist_values = []
-
-        # prev_histogram = self.__calc_hist_wo_norm(frameList[0])
-        prev_histogram_sum = np.array(frameList[0]).flatten().sum()
-        hist_values.append(prev_histogram_sum)
-
-        for i in range(1, len(frameList)):
-            # Compute the KL divergence between the histograms of the current and previous frames
-
-            # curr_histogram = self.__calc_hist_wo_norm(frameList[i])
-            curr_histogram_sum = np.array(frameList[i]).flatten().sum()
-            hist_values.append(curr_histogram_sum)
-
-            histogram_abs_diff = abs(curr_histogram_sum - prev_histogram_sum)
-            prev_histogram_sum = curr_histogram_sum
-
-            hist_diff.append(histogram_abs_diff)
-
-        return hist_diff, hist_values
+    # def get_hist_abs_diff(self, frameList):
+    #
+    #     frameList = np.array(frameList).astype(np.int32)
+    #     hist_diff = []
+    #     hist_values = []
+    #
+    #     prev_histogram_sum = np.array(frameList[0]).flatten().sum()
+    #     hist_values.append(prev_histogram_sum)
+    #
+    #     for i in range(1, len(frameList)):
+    #         # Compute the KL divergence between the histograms of the current and previous frames
+    #
+    #         curr_histogram_sum = np.array(frameList[i]).flatten().sum()
+    #         hist_values.append(curr_histogram_sum)
+    #
+    #         histogram_abs_diff = abs(curr_histogram_sum - prev_histogram_sum)
+    #         prev_histogram_sum = curr_histogram_sum
+    #
+    #         hist_diff.append(histogram_abs_diff)
+    #
+    #     return hist_diff, hist_values
 
     def get_frame_list(self, frame_type):
 
