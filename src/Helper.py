@@ -94,6 +94,20 @@ class Helper:
         df.drop_duplicates('time_stamps', inplace=True)
         df.reset_index(inplace=True)
         return df.to_dict('list')
+    
+    @staticmethod
+    def remove_duplicate_times(ip_list):
+        filtered_list = list()
+        u_filter = set()
+
+        for val in ip_list:
+            if int(val) in u_filter:
+                pass
+            else:
+                u_filter.add(int(val))
+                filtered_list.append(val)
+        
+        return filtered_list
 
     def plot_mfcc_diff_value(values, filename, savefig=True, dot_coords=None):
 

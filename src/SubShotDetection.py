@@ -5,6 +5,8 @@ import scipy.io.wavfile as wav
 import sklearn.preprocessing
 import numpy as np
 
+from Helper import Helper
+
 def spectral_centroid_ud(y, sr, n_fft, hop_length):
     #spectral centroid -- centre of mass -- weighted mean of the frequencies present in the sound
 
@@ -57,7 +59,7 @@ def plot_diffs(x,y,threshold,start, end):
     plt.ylabel('Y')
     plt.title('Line plot with threshold')
 
-    return subshot_times
+    return Helper.remove_duplicate_times(subshot_times)
     # Show the plot
     # plt.show()
 
