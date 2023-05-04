@@ -4,9 +4,9 @@ from Helper import Helper
 from VideoReader import RGBVideo
 
 
-def get_scenes(frame_type, analysis_type = "HSV_HUE-Scene-ChiSquareAlt"):
+def get_scenes(frame_type, path_rgb, analysis_type = "HSV_HUE-Scene-ChiSquareAlt"):
 
-    dest_dir = "./test/New-ReadyPlayerOne"
+    dest_dir = "./test/"
 
     video = RGBVideo(path_rgb, otherTypeConversions=[frame_type])
     frame_list = video.get_frame_list(frame_type=frame_type)
@@ -21,10 +21,7 @@ def get_scenes(frame_type, analysis_type = "HSV_HUE-Scene-ChiSquareAlt"):
 
     res = videoAnalyzer.findKeyFramesAndTimeStamps(threshold)
     Helper.write_to_json(res, "{}/{}-stats.json".format(dest_dir, analysis_type))
-    Helper.plot_hist_diff(hist_diff, "{}/{}-hist.png".format(dest_dir, analysis_type), hline=threshold, dot_coords=res["frames"])
+    # Helper.plot_hist_diff(hist_diff, "{}/{}-hist.png".format(dest_dir, analysis_type), hline=threshold, dot_coords=res["frames"])
 
-    return res
+    return res, video.frame_count
 
-frame_type="HSV_HUE"
-path_rgb = r"E:\CSCI-576-Project\data\Ready_Player_One_rgb\Ready_Player_One_rgb\InputVideo.rgb"
-print(get_scenes(frame_type))
