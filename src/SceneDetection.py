@@ -4,10 +4,11 @@ from Helper import Helper
 from VideoReader import RGBVideo
 
 
-def get_scenes(video, frame_type="HSV_HUE", analysis_type = "HSV_HUE-Scene-ChiSquareAlt"):
+def get_scenes(frame_type, analysis_type = "HSV_HUE-Scene-ChiSquareAlt"):
 
     dest_dir = "./test/New-ReadyPlayerOne"
 
+    video = RGBVideo(path_rgb, otherTypeConversions=[frame_type])
     frame_list = video.get_frame_list(frame_type=frame_type)
     frame_list = video.blur_frameList(frame_list, strength=15)
 
@@ -26,6 +27,4 @@ def get_scenes(video, frame_type="HSV_HUE", analysis_type = "HSV_HUE-Scene-ChiSq
 
 frame_type="HSV_HUE"
 path_rgb = r"E:\CSCI-576-Project\data\Ready_Player_One_rgb\Ready_Player_One_rgb\InputVideo.rgb"
-video = RGBVideo(path_rgb, otherTypeConversions=[frame_type])
-print(get_scenes(video))
-
+print(get_scenes(frame_type))
