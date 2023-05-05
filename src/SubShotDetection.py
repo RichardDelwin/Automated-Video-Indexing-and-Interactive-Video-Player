@@ -77,8 +77,9 @@ def get_subshots(path, shots_list, frame_rate):
     y, sr = librosa.load(path, sr=sample_rate, mono=False)
     y = librosa.to_mono(y)
 
+    shot_subshot_map = {}
+
     for idx, frame_end in enumerate(audio_frames[1:]):
-        idx = idx + 0
         start_idx = audio_frames[idx]
         end_idx = frame_end
         fact = 7.5
@@ -112,5 +113,8 @@ def get_subshots(path, shots_list, frame_rate):
         ts, abs_diffs, mean_diff, std_diff = spectral_centroid_stats(time_c, spec_cen_vals)
         th = mean_diff + fact*std_diff
         s_times = plot_diffs(ts, abs_diffs, th, start=start_idx/44100, end = end_idx/44100)
-        print(idx+1, start_idx*(frame_rate/sample_rate), shots_list[idx], s_times)
-        print()
+        # print(idx+1, start_idx*(frame_rate/sample_rate), shots_list[idx], s_times)
+        if len(s_times) != 0:
+            shot_subshot_map[shots_list[idx]] = list(s_times.copy())
+        # print()
+    return shot_subshot_map

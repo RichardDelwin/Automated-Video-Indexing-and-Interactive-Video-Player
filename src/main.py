@@ -63,4 +63,5 @@ if __name__ == "__main__":
     #     6276
     # ]
 
-    get_subshots(path_wav, shots_list=shots_list, frame_rate=30.0)
+    shot_subshot_map = get_subshots(path_wav, shots_list=shots_list, frame_rate=30.0)
+    print(shot_subshot_map)
