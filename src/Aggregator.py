@@ -231,8 +231,8 @@ def format_to_final_json(res, subshots_res):
             shot_start = shot[0]
 
             sub_i = 1
-            if str(shot_start) in subshots_res:
-                for subshot_time in subshots_res[str(shot_start)]:
+            if shot_start in subshots_res:
+                for subshot_time in subshots_res[shot_start]:
 
                     if sub_i == 1:
                         subshots_in_scene.append({
