@@ -93,7 +93,7 @@ def combine_scenes_and_shots(shots_res, scenes_res, total_frame_count):
 
     buckets = {k:sorted(v, key=lambda x: x[0]) for k, v in buckets.items()}
     buckets = convert_dict_to_json_format(buckets)
-    write_json(buckets, filename="./../data/combined.json")
+    write_json(buckets, filename="./test/combined.json")
 
     return buckets
 
@@ -262,14 +262,14 @@ def format_to_final_json(res, subshots_res):
 
     return {"data":scenes}
 
-shots_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV-Shot-Bhattacharya-res.json"
-scenes_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV_HUE-Scene-ChiSquareAlt-res.json"
-subshots_res = read_json(r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\map-res.json")
-shots_res = read_json(shots_res_json)
-scenes_res = read_json(scenes_res_json)
+# shots_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV-Shot-Bhattacharya-res.json"
+# scenes_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV_HUE-Scene-ChiSquareAlt-res.json"
+# subshots_res = read_json(r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\map-res.json")
+# shots_res = read_json(shots_res_json)
+# scenes_res = read_json(scenes_res_json)
 
-res = combine_scenes_and_shots(shots_res["frames"], scenes_res["frames"], 8682)
+# res = combine_scenes_and_shots(shots_res["frames"], scenes_res["frames"], 8682)
 
-json_final = format_to_final_json(res, subshots_res)
+# json_final = format_to_final_json(res, subshots_res)
 
-write_json(json_final, "./../data/final.json")
+# write_json(json_final, "./../data/final.json")
