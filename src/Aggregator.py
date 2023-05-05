@@ -92,7 +92,8 @@ def combine_scenes_and_shots(shots_res, scenes_res, total_frame_count):
                 scene_children.append(shot)
 
     buckets = {k:sorted(v, key=lambda x: x[0]) for k, v in buckets.items()}
-    write_json(convert_dict_to_json_format(buckets), filename="./../data/combined.json")
+    buckets = convert_dict_to_json_format(buckets)
+    write_json(buckets, filename="./../data/combined.json")
 
     return buckets
 
@@ -196,6 +197,21 @@ def get_timestamp_ms(frame_index, frame_rate=30):
     timestamp = f"{minutes:02}:{seconds:02}:{ms:03}"
     return timestamp
 
+def get_timestamp_from_ms(time):
+
+    time = int(time*1000)
+    ms = time % 1000
+    time = time // 1000
+
+    seconds = time % 60
+    time = time // 60
+
+    minutes = time % 60
+
+    timestamp = f"{minutes:02}:{seconds:02}:{ms:03}"
+    return timestamp
+
+
 def format_to_final_json(res, subshots_res):
 
     scenes = []
@@ -214,12 +230,22 @@ def format_to_final_json(res, subshots_res):
             subshots_in_scene = []
             shot_start = shot[0]
 
-            for sub_i, subshot_time in enumerate(subshots_res[shot_start]):
+            sub_i = 1
+            if str(shot_start) in subshots_res:
+                for subshot_time in subshots_res[str(shot_start)]:
 
-                subshots_in_scene.append({
-                    "name" : f"sub_shot_{sub_i+1}",
-                    "timestamp" : f"{subshot_time}"
-                })
+                    if sub_i == 1:
+                        subshots_in_scene.append({
+                            "name": f"sub_shot_{sub_i}",
+                            "timestamp": f"{get_timestamp_ms(shot_start)}"
+                        })
+                        sub_i+=1
+
+                    subshots_in_scene.append({
+                        "name" : f"sub_shot_{sub_i}",
+                        "timestamp" : f"{get_timestamp_from_ms(subshot_time)}"
+                    })
+                    sub_i += 1
 
             shots_in_scene.append({
                 "name" : f"shot_{shot_i+1}",
@@ -228,7 +254,7 @@ def format_to_final_json(res, subshots_res):
             })
 
         scenes.append({
-            f"scene_{scene_name}":{
+            f"{scene_name}":{
                 "timestamp": f"{get_timestamp_ms(scene_start)}",
                 "shots": shots_in_scene
             }
@@ -238,14 +264,12 @@ def format_to_final_json(res, subshots_res):
 
 shots_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV-Shot-Bhattacharya-res.json"
 scenes_res_json = r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\HSV_HUE-Scene-ChiSquareAlt-res.json"
-
+subshots_res = read_json(r"E:\CSCI-576-Project\Final_github_repo\CSCI576-Project\data\map-res.json")
 shots_res = read_json(shots_res_json)
 scenes_res = read_json(scenes_res_json)
 
 res = combine_scenes_and_shots(shots_res["frames"], scenes_res["frames"], 8682)
 
+json_final = format_to_final_json(res, subshots_res)
 
-# subshots_res = read_json("")
-# json_final = format_to_final_json(res, subshots_res)
-#
-# write_json(json_final, "./../data/final.json")
+write_json(json_final, "./../data/final.json")
